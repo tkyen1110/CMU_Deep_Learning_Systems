@@ -2,7 +2,7 @@ import numpy as np
 import sys
 import numdifftools as nd
 sys.path.append("./src")
-import mugrade
+# import mugrade
 from simple_ml import *
 try:
     from simple_ml_ext import *
@@ -19,11 +19,11 @@ def test_add():
     np.testing.assert_allclose(add(np.array([1,2]), np.array([3,4])),
                                np.array([4,6]))
 
-def submit_add():
-    mugrade.submit(add(1,2))
-    mugrade.submit(add(4.5, 3.2))
-    mugrade.submit(type(add(3,2)))
-    mugrade.submit(add(np.array([1.,2.]), np.array([5,6])))
+# def submit_add():
+#     mugrade.submit(add(1,2))
+#     mugrade.submit(add(4.5, 3.2))
+#     mugrade.submit(type(add(3,2)))
+#     mugrade.submit(add(np.array([1.,2.]), np.array([5,6])))
 
 
 ##############################################################################
@@ -44,15 +44,15 @@ def test_parse_mnist():
     np.testing.assert_equal(y[:10], [5, 0, 4, 1, 9, 2, 1, 3, 1, 4])
 
 
-def submit_parse_mnist():
-    X,y = parse_mnist("data/t10k-images-idx3-ubyte.gz",
-                      "data/t10k-labels-idx1-ubyte.gz")
-    mugrade.submit(X.dtype)
-    mugrade.submit(y.dtype)
-    mugrade.submit(X.shape)
-    mugrade.submit(y.shape)
-    mugrade.submit(np.linalg.norm(X[:10]))
-    mugrade.submit(y[:10])
+# def submit_parse_mnist():
+#     X,y = parse_mnist("data/t10k-images-idx3-ubyte.gz",
+#                       "data/t10k-labels-idx1-ubyte.gz")
+#     mugrade.submit(X.dtype)
+#     mugrade.submit(y.dtype)
+#     mugrade.submit(X.shape)
+#     mugrade.submit(y.shape)
+#     mugrade.submit(np.linalg.norm(X[:10]))
+#     mugrade.submit(y[:10])
 
 
 ##############################################################################
@@ -69,12 +69,12 @@ def test_softmax_loss():
     np.testing.assert_allclose(softmax_loss(Z,y), 2.7291998)
 
 
-def submit_softmax_loss():
-    X,y = parse_mnist("data/t10k-images-idx3-ubyte.gz",
-                      "data/t10k-labels-idx1-ubyte.gz")
-    np.random.seed(0)
-    mugrade.submit(softmax_loss(np.zeros((y.shape[0], 10)),y))
-    mugrade.submit(softmax_loss(np.random.randn(y.shape[0], 10),y))
+# def submit_softmax_loss():
+#     X,y = parse_mnist("data/t10k-images-idx3-ubyte.gz",
+#                       "data/t10k-labels-idx1-ubyte.gz")
+#     np.random.seed(0)
+#     mugrade.submit(softmax_loss(np.zeros((y.shape[0], 10)),y))
+#     mugrade.submit(softmax_loss(np.random.randn(y.shape[0], 10),y))
 
 
 ##############################################################################
@@ -100,18 +100,18 @@ def test_softmax_regression_epoch():
                                rtol=1e-5, atol=1e-5)
 
 
-def submit_softmax_regression_epoch():
-    X,y = parse_mnist("data/t10k-images-idx3-ubyte.gz",
-                      "data/t10k-labels-idx1-ubyte.gz")
+# def submit_softmax_regression_epoch():
+#     X,y = parse_mnist("data/t10k-images-idx3-ubyte.gz",
+#                       "data/t10k-labels-idx1-ubyte.gz")
 
-    theta = np.zeros((X.shape[1], y.max()+1), dtype=np.float32)
-    softmax_regression_epoch(X[:100], y[:100], theta, lr=0.2, batch=100)
-    mugrade.submit(np.linalg.norm(theta))
+#     theta = np.zeros((X.shape[1], y.max()+1), dtype=np.float32)
+#     softmax_regression_epoch(X[:100], y[:100], theta, lr=0.2, batch=100)
+#     mugrade.submit(np.linalg.norm(theta))
 
-    theta = np.zeros((X.shape[1], y.max()+1), dtype=np.float32)
-    softmax_regression_epoch(X, y, theta, lr=0.1, batch=200)
-    mugrade.submit(np.linalg.norm(theta))
-    mugrade.submit(loss_err(X@theta, y))
+#     theta = np.zeros((X.shape[1], y.max()+1), dtype=np.float32)
+#     softmax_regression_epoch(X, y, theta, lr=0.1, batch=200)
+#     mugrade.submit(np.linalg.norm(theta))
+#     mugrade.submit(loss_err(X@theta, y))
 
 ##############################################################################
 ### TESTS/SUBMISSION CODE FOR nn_epoch()
@@ -148,24 +148,24 @@ def test_nn_epoch():
                                (0.19770025, 0.06006667), rtol=1e-4, atol=1e-4)
 
 
-def submit_nn_epoch():
-    X,y = parse_mnist("data/train-images-idx3-ubyte.gz",
-                      "data/train-labels-idx1-ubyte.gz")
+# def submit_nn_epoch():
+#     X,y = parse_mnist("data/train-images-idx3-ubyte.gz",
+#                       "data/train-labels-idx1-ubyte.gz")
 
-    np.random.seed(1)
-    W1 = np.random.randn(X.shape[1], 100).astype(np.float32) / np.sqrt(100)
-    W2 = np.random.randn(100, 10).astype(np.float32) / np.sqrt(10)
-    nn_epoch(X[:100], y[:100], W1, W2, lr=0.1, batch=100)
-    mugrade.submit(np.linalg.norm(W1))
-    mugrade.submit(np.linalg.norm(W2))
+#     np.random.seed(1)
+#     W1 = np.random.randn(X.shape[1], 100).astype(np.float32) / np.sqrt(100)
+#     W2 = np.random.randn(100, 10).astype(np.float32) / np.sqrt(10)
+#     nn_epoch(X[:100], y[:100], W1, W2, lr=0.1, batch=100)
+#     mugrade.submit(np.linalg.norm(W1))
+#     mugrade.submit(np.linalg.norm(W2))
 
-    np.random.seed(1)
-    W1 = np.random.randn(X.shape[1], 100).astype(np.float32) / np.sqrt(100)
-    W2 = np.random.randn(100, 10).astype(np.float32) / np.sqrt(10)
-    nn_epoch(X, y, W1, W2, lr=0.2, batch=100)
-    mugrade.submit(np.linalg.norm(W1))
-    mugrade.submit(np.linalg.norm(W2))
-    mugrade.submit(loss_err(np.maximum(X@W1,0)@W2, y))
+#     np.random.seed(1)
+#     W1 = np.random.randn(X.shape[1], 100).astype(np.float32) / np.sqrt(100)
+#     W2 = np.random.randn(100, 10).astype(np.float32) / np.sqrt(10)
+#     nn_epoch(X, y, W1, W2, lr=0.2, batch=100)
+#     mugrade.submit(np.linalg.norm(W1))
+#     mugrade.submit(np.linalg.norm(W2))
+#     mugrade.submit(loss_err(np.maximum(X@W1,0)@W2, y))
 
 
 ##############################################################################
@@ -191,15 +191,15 @@ def test_softmax_regression_epoch_cpp():
                                rtol=1e-5, atol=1e-5)
 
 
-def submit_softmax_regression_epoch_cpp():
-    X,y = parse_mnist("data/t10k-images-idx3-ubyte.gz",
-                      "data/t10k-labels-idx1-ubyte.gz")
+# def submit_softmax_regression_epoch_cpp():
+#     X,y = parse_mnist("data/t10k-images-idx3-ubyte.gz",
+#                       "data/t10k-labels-idx1-ubyte.gz")
 
-    theta = np.zeros((X.shape[1], y.max()+1), dtype=np.float32)
-    softmax_regression_epoch_cpp(X[:100], y[:100], theta, lr=0.2, batch=100)
-    mugrade.submit(np.linalg.norm(theta))
+#     theta = np.zeros((X.shape[1], y.max()+1), dtype=np.float32)
+#     softmax_regression_epoch_cpp(X[:100], y[:100], theta, lr=0.2, batch=100)
+#     mugrade.submit(np.linalg.norm(theta))
 
-    theta = np.zeros((X.shape[1], y.max()+1), dtype=np.float32)
-    softmax_regression_epoch_cpp(X, y, theta, lr=0.1, batch=200)
-    mugrade.submit(np.linalg.norm(theta))
-    mugrade.submit(loss_err(X@theta, y))
+#     theta = np.zeros((X.shape[1], y.max()+1), dtype=np.float32)
+#     softmax_regression_epoch_cpp(X, y, theta, lr=0.1, batch=200)
+#     mugrade.submit(np.linalg.norm(theta))
+#     mugrade.submit(loss_err(X@theta, y))

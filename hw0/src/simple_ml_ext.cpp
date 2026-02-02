@@ -33,7 +33,51 @@ void softmax_regression_epoch_cpp(const float *X, const unsigned char *y,
      */
 
     /// BEGIN YOUR CODE
+    size_t epochs = m / batch;
+    float* Z_numerator = new float[batch * k];
+    float* Z_denominator = new float[batch];
+    float* Z = Z_numerator;  // Reuse Z_numerator for Z after normalization
+    float* gradient = new float[n * k];
 
+    for (size_t i = 0; i < epochs; i++) {
+        const float *X_batch = X+(i*batch*n);
+        const unsigned char *y_batch = y+(i*batch);
+
+        // Compute logits and softmax probabilities
+        for (size_t j = 0; j < batch; j++) {
+            Z_denominator[j] = 0.0f;
+            for (size_t c = 0; c < k; c++) {        
+                Z_numerator[j * k + c] = 0.0f;
+                for (size_t d = 0; d < n; d++) {
+                    Z_numerator[j * k + c] += X_batch[j * n + d] * theta[d * k + c];
+                }
+                Z_numerator[j * k + c] = std::exp(Z_numerator[j * k + c]);
+                Z_denominator[j] += Z_numerator[j * k + c];
+            }
+            
+            for (size_t c = 0; c < k; c++) {
+                Z_numerator[j * k + c] = Z_numerator[j * k + c] / Z_denominator[j];
+                if (y_batch[j] == c) {
+                    Z_numerator[j * k + c] -= 1.0f;  // Subtract 1 for the correct class
+                }
+            }
+        }
+
+        for (size_t d = 0; d < n; d++) {
+            for (size_t c = 0; c < k; c++) {
+                gradient[d * k + c] = 0.0f;
+                for (size_t j = 0; j < batch; j++) {
+                     gradient[d * k + c] += X_batch[j * n + d] * Z[j * k + c];
+                }
+                gradient[d * k + c] /= batch;
+                theta[d * k + c] -= lr * gradient[d * k + c];
+            }
+        }
+    }
+
+    delete[] Z_numerator;
+    delete[] Z_denominator;
+    delete[] gradient;
     /// END YOUR CODE
 }
 

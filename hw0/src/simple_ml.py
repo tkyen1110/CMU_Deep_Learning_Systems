@@ -6,6 +6,8 @@ try:
 except:
     pass
 
+import logging
+logger = logging.getLogger(__name__)
 
 def add(x, y):
     """ A trivial 'add' function you should implement to get used to the
@@ -20,7 +22,7 @@ def add(x, y):
         Sum of x + y
     """
     ### BEGIN YOUR CODE
-    pass
+    return x + y
     ### END YOUR CODE
 
 
@@ -48,7 +50,35 @@ def parse_mnist(image_filename, label_filename):
                 for MNIST will contain the values 0-9.
     """
     ### BEGIN YOUR CODE
-    pass
+    with gzip.open(label_filename) as f:
+        logger.debug('Start read label_file: '+ label_filename)
+        magic_number = int.from_bytes(f.read(4), 'big')
+        logger.debug('test_label_file magic number is ' + str(magic_number))
+        if magic_number == 2049:
+            num_items = int.from_bytes(f.read(4), 'big')
+            logger.debug('items number is ' + str(num_items))
+            labels_uint8 = np.frombuffer(f.read(), dtype = np.uint8)
+            #labels = labels.reshape(num_items)
+        else:
+            logger.error('file format error')
+            return
+
+    with gzip.open(image_filename) as f:
+        logger.debug("Start read image_file: "+ image_filename)
+        magic_number = int.from_bytes(f.read(4), 'big')
+        logger.debug('test_label_file magic number is '+ str(magic_number))
+        if magic_number == 2051:
+            num_items = int.from_bytes(f.read(4), 'big')
+            num_rows = int.from_bytes(f.read(4), 'big')
+            num_cols = int.from_bytes(f.read(4), 'big')
+            logger.debug('items,row,col number is ' + str(num_items) +' '+ str(num_rows)+' '+ str(num_cols))
+            images_uint8 = np.frombuffer(f.read(),dtype = np.uint8)
+            images_uint8 = images_uint8.reshape(num_items,num_rows*num_cols)
+            images_float32 = (images_uint8/255.0) .astype(np.float32)
+        else:
+            logger.error('file format error')
+            return
+    return  images_float32, labels_uint8
     ### END YOUR CODE
 
 
@@ -68,7 +98,9 @@ def softmax_loss(Z, y):
         Average softmax loss over the sample.
     """
     ### BEGIN YOUR CODE
-    pass
+    Zy = -Z[np.arange(y.shape[0]),y]
+    Z_log_exp = np.log(np.sum(np.exp(Z), axis=1))
+    return np.mean(Zy + Z_log_exp)
     ### END YOUR CODE
 
 
@@ -91,7 +123,17 @@ def softmax_regression_epoch(X, y, theta, lr = 0.1, batch=100):
         None
     """
     ### BEGIN YOUR CODE
-    pass
+    epochs = X.shape[0] // batch
+    for i in range(epochs):
+        X_batch = X[i*batch:(i+1)*batch, :]
+        y_batch = y[i*batch:(i+1)*batch]
+        Z_numerator = np.exp(X_batch @ theta)
+        Z_denominator = np.sum(Z_numerator, axis=1)[:, None]
+        Z = Z_numerator / Z_denominator
+        Iy = np.zeros_like(Z)
+        Iy[np.arange(y_batch.shape[0]), y_batch] = 1
+        gradient = X_batch.T @ (Z - Iy) / batch
+        theta -= lr * gradient
     ### END YOUR CODE
 
 
@@ -118,7 +160,31 @@ def nn_epoch(X, y, W1, W2, lr = 0.1, batch=100):
         None
     """
     ### BEGIN YOUR CODE
-    pass
+    epochs = X.shape[0] // batch
+    for i in range(epochs):
+        X_batch = X[i*batch:(i+1)*batch, :]
+        y_batch = y[i*batch:(i+1)*batch]
+
+        # Forward pass
+        H1 = X_batch @ W1
+        H2 = np.maximum(H1, 0)  # ReLU activation
+        Z_numerator = np.exp(H2 @ W2)
+        Z_denominator = np.sum(Z_numerator, axis=1)[:, None]
+        Z = Z_numerator / Z_denominator
+        
+        # Compute gradients
+        Iy = np.zeros_like(Z)
+        Iy[np.arange(y_batch.shape[0]), y_batch] = 1
+        dZ = (Z - Iy) / batch
+        
+        dW2 = H2.T @ dZ
+        dH2 = dZ @ W2.T
+        dH1 = dH2 * (H1 > 0)  # Backprop through ReLU
+        dW1 = X_batch.T @ dH1
+        
+        # Update weights
+        W1 -= lr * dW1
+        W2 -= lr * dW2
     ### END YOUR CODE
 
 
